@@ -44,6 +44,7 @@ def handle():
             "id": str(data.get("id")),
             "values": vector,
             "metadata": {
+                "id": str(data.get("id")),
                 "name": data.get("name"),
                 "brand": data.get("brand"),
                 "color": data.get("color"),

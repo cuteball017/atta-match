@@ -51,7 +51,8 @@ def handle():
                 "place": data.get("place"),
                 "img_url": data.get("img_url"),
                 "created_at": data.get("created_at"),
-                "category": data.get("category")
+                "category": data.get("category"),
+                "text": text  # ✅ 검색용 필드 반드시 추가
             }
         })
 

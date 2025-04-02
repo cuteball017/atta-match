@@ -16,7 +16,7 @@ pc = Pinecone(api_key=PINECONE_API_KEY)
 index = pc.Index(PINECONE_INDEX_NAME)
 
 # ✅ 전역 id 카운터 시작값
-id_counter = 218
+id_counter = 220
 
 @app.route("/webhook", methods=["POST"])
 def handle():

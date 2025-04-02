@@ -28,6 +28,7 @@ def handle():
     for data in data_list:
         # 포함할 필드만 연결해서 텍스트로 만듦
         text = " / ".join([
+            str(data.get("id")),
             str(data.get("name", "")),
             str(data.get("brand", "")),
             str(data.get("color", "")),

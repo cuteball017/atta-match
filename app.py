@@ -15,20 +15,28 @@ embeddings = OpenAIEmbeddings(api_key=OPENAI_API_KEY)
 pc = Pinecone(api_key=PINECONE_API_KEY)
 index = pc.Index(PINECONE_INDEX_NAME)
 
+# ✅ 전역 id 카운터 시작값
+id_counter = 218
+
 @app.route("/webhook", methods=["POST"])
 def handle():
+    global id_counter  # 전역 변수 사용 선언
+
     data_list = request.get_json()
 
-    # 단일 객체로 보내는 경우에도 리스트로 처리
     if isinstance(data_list, dict):
         data_list = [data_list]
 
     items_to_upsert = []
 
     for data in data_list:
-        # 포함할 필드만 연결해서 텍스트로 만듦
+        # ✅ 현재 ID 설정 및 증가
+        current_id = str(id_counter)
+        id_counter += 1
+
+        # 포함할 필드 연결
         text = " / ".join([
-            str(data.get("id")),
+            current_id,
             str(data.get("name", "")),
             str(data.get("brand", "")),
             str(data.get("color", "")),
@@ -42,10 +50,10 @@ def handle():
         vector = embeddings.embed_query(text)
 
         items_to_upsert.append({
-            "id": str(data.get("id")),
+            "id": current_id,  # ✅ Pinecone의 ID
             "values": vector,
             "metadata": {
-                "id": str(data.get("id")),
+                "id": current_id,  # ✅ 검색 결과에서도 ID 확인 가능
                 "name": data.get("name"),
                 "brand": data.get("brand"),
                 "color": data.get("color"),
@@ -54,18 +62,17 @@ def handle():
                 "img_url": data.get("img_url"),
                 "created_at": data.get("created_at"),
                 "category": data.get("category"),
-                "text": text  # ✅ 검색용 필드 반드시 추가
+                "text": text
             }
         })
 
     # Pinecone에 한번에 저장
     index.upsert(items_to_upsert)
 
-    return jsonify({"status": "ok", "count": len(items_to_upsert)})
+    return jsonify({"status": "ok", "count": len(items_to_upsert), "start_id": id_counter - len(data_list)})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000)
-
 
 
 

@@ -63,7 +63,7 @@ def handle():
     # Pinecone에 한번에 저장
     index.upsert(items_to_upsert)
 
-    return jsonify({"status": "ok", "count": len(items_to_upsert), "start_id": id_counter - len(data_list)})
+    return jsonify({"status": "ok", "count": len(items_to_upsert)})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000)

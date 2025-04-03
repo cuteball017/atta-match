@@ -15,9 +15,6 @@ embeddings = OpenAIEmbeddings(api_key=OPENAI_API_KEY)
 pc = Pinecone(api_key=PINECONE_API_KEY)
 index = pc.Index(PINECONE_INDEX_NAME)
 
-# ✅ 전역 id 카운터 시작값
-id_counter = 220
-
 @app.route("/webhook", methods=["POST"])
 def handle():
     global id_counter  # 전역 변수 사용 선언
@@ -30,13 +27,10 @@ def handle():
     items_to_upsert = []
 
     for data in data_list:
-        # ✅ 현재 ID 설정 및 증가
-        current_id = str(id_counter)
-        id_counter += 1
 
         # 포함할 필드 연결
         text = " / ".join([
-            current_id,
+            str(data.get("id","")),
             str(data.get("name", "")),
             str(data.get("brand", "")),
             str(data.get("color", "")),
@@ -50,10 +44,10 @@ def handle():
         vector = embeddings.embed_query(text)
 
         items_to_upsert.append({
-            "id": current_id,  # ✅ Pinecone의 ID
+            "id": data.get("id"),  # ✅ Pinecone의 ID
             "values": vector,
             "metadata": {
-                "id": current_id,  # ✅ 검색 결과에서도 ID 확인 가능
+                "id": data.get("id"),  # ✅ 검색 결과에서도 ID 확인 가능
                 "name": data.get("name"),
                 "brand": data.get("brand"),
                 "color": data.get("color"),
